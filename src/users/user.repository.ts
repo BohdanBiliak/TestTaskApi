@@ -32,7 +32,14 @@ export class UserRepository {
     limit: number,
     filters?: { name?: string; email?: string; phone?: string },
   ): Promise<User[]> {
-    const query: any = cursor ? { _id: { $gt: cursor } } : {};
+    type QueryType = {
+      _id?: { $gt: string };
+      email?: string;
+      phone?: string;
+      name?: { $regex: RegExp };
+    };
+
+    const query: QueryType = cursor ? { _id: { $gt: cursor } } : {};
 
     if (filters) {
       if (filters.email) {
