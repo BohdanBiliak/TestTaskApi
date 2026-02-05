@@ -30,8 +30,22 @@ export class UserRepository {
   async findWithCursorPagination(
     cursor: string | null,
     limit: number,
+    filters?: { name?: string; email?: string; phone?: string },
   ): Promise<User[]> {
-    const query = cursor ? { _id: { $gt: cursor } } : {};
+    const query: any = cursor ? { _id: { $gt: cursor } } : {};
+
+    if (filters) {
+      if (filters.email) {
+        query.email = filters.email;
+      }
+      if (filters.phone) {
+        query.phone = filters.phone;
+      }
+      if (filters.name) {
+        query.name = { $regex: new RegExp(filters.name, 'i') };
+      }
+    }
+
     return this.userModel.find(query).limit(limit).sort({ _id: 1 }).exec();
   }
 }

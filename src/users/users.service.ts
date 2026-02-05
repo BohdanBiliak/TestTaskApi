@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { UserRepository } from './user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
+import { GetUsersDto } from './dto/get-users.dto';
 import { User } from './schemas/user.schema';
 
 @Injectable()
@@ -28,5 +29,26 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  async getUsers(getUsersDto: GetUsersDto) {
+    const { cursor, limit = 10, name, email, phone } = getUsersDto;
+
+    const filters = { name, email, phone };
+
+    const users = await this.userRepository.findWithCursorPagination(
+      cursor || null,
+      limit,
+      filters,
+    );
+
+    const nextCursor =
+      users.length === limit ? users[users.length - 1]._id : null;
+
+    return {
+      users,
+      nextCursor,
+      hasMore: users.length === limit,
+    };
   }
 }

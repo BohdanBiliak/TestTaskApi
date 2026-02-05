@@ -1,6 +1,15 @@
-import { Controller, Post, Body, UseGuards, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Get,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { GetUsersDto } from './dto/get-users.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('api/v1')
@@ -16,5 +25,10 @@ export class UsersController {
   @Get('get-user/:id')
   async getUser(@Param('id') id: string) {
     return this.usersService.getUserById(id);
+  }
+
+  @Get('get-users')
+  async getUsers(@Query() getUsersDto: GetUsersDto) {
+    return this.usersService.getUsers(getUsersDto);
   }
 }
