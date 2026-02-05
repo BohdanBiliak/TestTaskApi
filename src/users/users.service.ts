@@ -38,17 +38,19 @@ export class UsersService {
 
     const users = await this.userRepository.findWithCursorPagination(
       cursor || null,
-      limit,
+      limit + 1,
       filters,
     );
 
-    const nextCursor =
-      users.length === limit ? users[users.length - 1]._id : null;
+    const hasMore = users.length > limit;
+    
+    const resultUsers = hasMore ? users.slice(0, limit) : users;
+    const nextCursor = hasMore ? users[limit - 1]._id : null;
 
     return {
-      users,
+      users: resultUsers,
       nextCursor,
-      hasMore: users.length === limit,
+      hasMore,
     };
   }
 }
