@@ -1,0 +1,26 @@
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { User } from './schemas/user.schema';
+
+@Injectable()
+export class UserRepository {
+  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+
+  async create(userData: Partial<User>): Promise<User> {
+    const user = new this.userModel(userData);
+    return user.save();
+  }
+
+  async findById(id: string): Promise<User | null> {
+    return this.userModel.findById(id).exec();
+  }
+
+  async findWithCursorPagination(
+    cursor: string | null,
+    limit: number,
+  ): Promise<User[]> {
+    const query = cursor ? { _id: { $gt: cursor } } : {};
+    return this.userModel.find(query).limit(limit).sort({ _id: 1 }).exec();
+  }
+}
