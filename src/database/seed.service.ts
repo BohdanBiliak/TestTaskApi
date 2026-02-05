@@ -22,22 +22,33 @@ export class SeedService implements OnModuleInit {
       const count = await this.userModel.countDocuments().exec();
       this.logger.log(`Found ${count} users in database`);
 
-      if (count > 0) {
+      if (count === 0) {
+        this.logger.log('Creating test user for Swagger authentication...');
+        await this.userModel.create({
+          name: 'Test User',
+          email: 'test@example.com',
+          phone: '+380123456789',
+          birthDate: new Date('1990-01-15'),
+          createdAt: new Date(),
+        });
+        this.logger.log(
+          'Test user created. Login credentials: email=test@example.com, phone=+380123456789',
+        );
+
+        this.logger.log(
+          `Starting background seed of ${this.TOTAL_USERS} additional users...`,
+        );
+
+        this.generateUsersInBackground().catch((error) => {
+          this.logger.error('Error during background seeding', error.stack);
+        });
+
+        this.logger.log('Seed process started in background. API is ready.');
+      } else {
         this.logger.log(
           `Database already contains ${count} users. Skipping seed.`,
         );
-        return;
       }
-
-      this.logger.log(
-        `Database is empty. Starting background seed of ${this.TOTAL_USERS} users...`,
-      );
-
-      this.generateUsersInBackground().catch((error) => {
-        this.logger.error('Error during background seeding', error.stack);
-      });
-
-      this.logger.log('Seed process started in background. API is ready.');
     } catch (error) {
       this.logger.error('Error checking database status', error.stack);
     }
