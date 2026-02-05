@@ -16,6 +16,17 @@ export class UserRepository {
     return this.userModel.findById(id).exec();
   }
 
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userModel.findOne({ email }).exec();
+  }
+
+  async updateRefreshToken(
+    userId: string,
+    refreshToken: string,
+  ): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, { refreshToken }).exec();
+  }
+
   async findWithCursorPagination(
     cursor: string | null,
     limit: number,

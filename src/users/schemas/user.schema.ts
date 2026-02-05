@@ -16,6 +16,9 @@ export class User extends Document {
   birthDate: Date;
 
   @Prop()
+  refreshToken: string;
+
+  @Prop()
   createdAt: Date;
 }
 
