@@ -8,13 +8,12 @@ services:
       target: development
     container_name: nestjs-api
     ports:
-      - "3000:3000"
+      - "${PORT:-3000}:3000"
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    environment:
-      - NODE_ENV=development
-      - MONGODB_URI=mongodb://mongodb:27017/testTask
+    env_file:
+      - .env
     depends_on:
       - mongodb
     command: npm run start:dev
