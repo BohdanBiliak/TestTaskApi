@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UserRepository } from '../users/user.repository';
@@ -15,7 +15,7 @@ export class AuthService {
     const user = await this.userRepository.findByEmail(loginDto.email);
 
     if (!user || user.phone !== loginDto.phone) {
-      throw new Error('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials');
     }
 
     const tokens = await this.generateTokens(user._id.toString());
@@ -28,13 +28,13 @@ export class AuthService {
     const user = await this.userRepository.findById(userId);
 
     if (!user || !user.refreshToken) {
-      throw new Error('Access denied');
+      throw new UnauthorizedException('Access denied');
     }
 
     const isValid = await bcrypt.compare(refreshToken, user.refreshToken);
 
     if (!isValid) {
-      throw new Error('Access denied');
+      throw new UnauthorizedException('Access denied');
     }
 
     const tokens = await this.generateTokens(user._id.toString());
